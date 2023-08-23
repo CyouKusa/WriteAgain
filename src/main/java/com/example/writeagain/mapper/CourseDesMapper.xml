@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.writeagain.mapper.CourseDesMapper">
+    <insert id="addCourseDes" parameterType="com.example.writeagain.javabean.CourseDes">
+    insert into edu_course_des (id, des, gmt_created, gmt_modified) VALUE
+    (#{id},#{des},#{gmtCreated},#{gmtModified})
+    </insert>
+    <select id="getCourseDesByCourseId" parameterType="int" resultType="com.example.writeagain.javabean.CourseDes">
+        select des from edu_course_des where id=#{courseId}
+    </select>
+    <update id="updateCourseDes" parameterType="com.example.writeagain.javabean.CourseDes">
+        update edu_course_des set des=#{des},gmt_modified=#{gmtModified} where id = #{id}
+    </update>
+    <delete id="deleteCourseDes" parameterType="int">
+        delete from  edu_course_des where id = #{id}
+    </delete>
+</mapper>

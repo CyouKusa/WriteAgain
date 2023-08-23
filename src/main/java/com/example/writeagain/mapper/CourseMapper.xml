@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.writeagain.mapper.CourseMapper">
+    <insert id="addCourse" parameterType="com.example.writeagain.javabean.Course">
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            select LAST_INSERT_ID()
+        </selectKey>
+        insert into edu_course (teacher_id, subject_id, title, price, lesson_num, cover, buy_count, view_count, status,
+        gmt_created, gmt_modified) value
+        (#{teacherId},#{subjectId},#{title},#{price},#{lessonNum},#{cover},#{buyCount},#{viewCount},#{status},#{gmtCreated},#{gmtModified})
+    </insert>
+    <select id="getCourseByCourseId" parameterType="int" resultType="com.example.writeagain.javabean.Course">
+        select title, subject_id, teacher_id, price, lesson_num, cover
+        from edu_course
+        where id = #{courseId}
+    </select>
+    <resultMap id="resultMap_Course" type="com.example.writeagain.javabean.Course">
+        <id column="id" property="id"/>
+        <result column="teacher_id" property="teacherId"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="title" property="title"/>
+        <result column="price" property="price"/>
+        <result column="lesson_num" property="lessonNum"/>
+        <result column="cover" property="cover"/>
+        <result column="buy_count" property="buyCount"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="status" property="status"/>
+        <result column="gmt_created" property="gmtCreated"/>
+        <result column="gmt_modified" property="gmtModified"/>
+        <association property="courseDes" javaType="com.example.writeagain.javabean.CourseDes">
+            <result column="des" property="des"/>
+        </association>
+        <!--  还可以再补Chapter的属性-->
+    </resultMap>
+
+    <select id="getCourse" parameterType="int" resultMap="resultMap_Course">
+        select edu_course.id,
+               edu_course.teacher_id,
+               edu_course.subject_id,
+               edu_course.title,
+               edu_course.price,
+               edu_course.lesson_num,
+               edu_course.cover,
+               edu_course_des.des des
+        from edu_course
+                 inner join edu_course_des on edu_course.id = edu_course_des.id
+        where edu_course.id = #{courseId}
+    </select>
+    <update id="updateCourse" parameterType="com.example.writeagain.javabean.Course">
+        update edu_course
+        set title=#{title},
+            gmt_modified=#{gmtModified},
+            teacher_id=#{teacherId},
+            subject_id=#{subjectId},
+            price=#{price},
+            lesson_num=#{lessonNum},
+            cover=#{cover}
+        where id = #{id}
+    </update>
+    <select id="getCourseBeforeSubmit" parameterType="int" resultType="com.example.writeagain.vo.CourseBeforeSubmit">
+        select c.id id, c.title title, t.name teacherName, c.price, c.lesson_num videoCount, c.cover cover
+        from edu_course c
+                 left join edu_teacher t on c.teacher_id = t.id
+        where c.id = #{id}
+    </select>
+    <update id="submitCourse" parameterType="com.example.writeagain.javabean.Course">
+        update edu_course
+        set status =#{status}
+        where id = #{id}
+    </update>
+    <select id="getCourseList"  resultType="com.example.writeagain.vo.CourseBeforeSubmit">
+        select c.id       id,
+               c.title    title,
+               c.price    price,
+               c.status   status,
+               buy_count  buyCount,
+               view_count viewCount,
+               t.name     teacherName,
+               CONCAT(
+                       IFNULL(CONCAT(s3.title, '/'), ''),
+                       IFNULL(CONCAT(s2.title, '/'), ''),
+                       s1.title
+                   )      subject
+        from edu_course c
+                 left join edu_teacher t on c.teacher_id = t.id
+                 left join edu_subject s1 on c.subject_id = s1.id
+                 left join edu_subject s2 on s1.parent_id = s2.id
+                 left join edu_subject s3 on s2.parent_id = s3.id
+        <where>
+            c.id!=0
+            <if test="condition.courseName!='' and condition.courseName!=null">
+                and c.title LIKE "%${condition.courseName}%"
+            </if>
+            <if test="condition.status!='' and condition.status!=null">
+                and c.status = #{condition.status}
+            </if>
+            <if test="condition.TeacherName!='' and condition.TeacherName!=null">
+                and t.name LIKE "%${condition.TeacherName}%"
+            </if>
+            <if test="condition.subjectId!=0 and condition.subjectId!=null">
+                and c.subject_id=#{condition.subjectId}
+            </if>
+        </where>
+        limit #{startIndex},#{pagesize}
+    </select>
+    <delete id="deleteCourse" parameterType="int">
+        delete from edu_course where id=#{id}
+    </delete>
+    <select id="getCourseListTotal" resultType="int">
+        select
+            count(*) from edu_course c left join edu_teacher t on c.teacher_id = t.id
+    <where>
+        c.id!=0
+        <if test="courseName!='' and condition.courseName!=null">
+            and c.title =#{courseName}
+        </if>
+        <if test="status!='' and status!=null">
+            and c.status = #{status}
+        </if>
+        <if test="TeacherName!='' and TeacherName!=null">
+            and t.name = #{TeacherName}
+        </if>
+        <if test="subjectId!=0 and subject!=null">
+            and c.subject_id=#{subjectId}
+        </if>
+    </where>
+    </select>
+    <select id="getCourseCount" resultType="com.example.writeagain.vo.CourseCountOfSubject">
+        SELECT s.title name,COUNT(c.subject_id) Value FROM edu_course c LEFT JOIN edu_subject s ON c.subject_id = s.id group by subject_id
+    </select>
+</mapper>

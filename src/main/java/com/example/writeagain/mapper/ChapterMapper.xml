@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.writeagain.mapper.ChapterMapper">
+    <select id="getChatpers" parameterType="int" resultMap="chapter_video">
+        select
+             c.id,
+            c.title,
+        c.gmt_created,
+        c.gmt_modified,
+        v.id v_id,
+        v.title v_title,
+        v.is_free v_free,
+        v.size v_size,
+        v.video_source_id v_video_source_id,
+        v.duration v_duration,
+        v.play_count v_play_count
+        from edu_chapter c
+                 left join edu_video v on c.id = v.chapter_id
+        where c.course_id = #{courseId}
+    </select>
+    <insert id="addChapter" parameterType="com.example.writeagain.javabean.Chapter">
+        insert into edu_chapter (course_id, title, gmt_created, gmt_modified) VALUE
+            (#{courseId}, #{title}, #{gmtCreated}, #{gmtModified})
+    </insert>
+    <delete id="deleteChapter">
+        delete from edu_chapter where id =#{chapterId} and course_id=#{courseId}
+    </delete>
+    <delete id="deleteChapterByCourseId" parameterType="int">
+        delete from edu_chapter where course_id=#{id}
+    </delete>
+
+    <resultMap id="chapter_video" type="com.example.writeagain.javabean.Chapter">
+        <id column="id" property="id"/>
+        <result column="course_id" property="courseId"/>
+        <result column="title" property="title"/>
+        <result column="gmt_created" property="gmtCreated"/>
+        <result column="gmt_modified" property="gmtModified"/>
+        <collection property="videoList" javaType="java.util.List" ofType="com.example.writeagain.javabean.video">
+            <id column="v_id" property="id"/>
+            <result column="v_title" property="title"/>
+            <result column="v_video_source_id" property="videoSourceId"/>
+            <result column="v_video_original_name" property="videoOriginalName"/>
+            <result column="v_play_count" property="playCount"/>
+            <result column="v_free" property="free"/>
+            <result column="v_duration" property="duration"/>
+            <result column="v_status" property="status"/>
+            <result column="v_size" property="size"/>
+            <result column="v_gmt_created" property="gmtCreated"/>
+            <result column="v_gmt_modified" property="gmtModified"/>
+        </collection>
+    </resultMap>
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.writeagain.mapper.UserMapper">
+    <insert id="addUser" parameterType="com.example.writeagain.javabean.User">
+        insert into edu_user (username, pass_word, nick_name, avatar, email, gmt_created, gmt_modified, is_delete) value
+        (#{username},#{passWord},#{nickName},#{avatar},#{email},#{gmtCreated},#{gmtModified},#{isDelete})
+    </insert>
+    <update id="deleteUser" parameterType="integer">
+        update edu_user set is_delete=false where id=#{id} and is_delete=1
+    </update>
+    <select id="login" parameterType="com.example.writeagain.javabean.User" resultType="com.example.writeagain.javabean.User">
+        select * from edu_user where username=#{username} and pass_word=#{passWord} and is_delete=1
+    </select>
+    <select id="getUserByUserName" parameterType="string" resultType="com.example.writeagain.javabean.User">
+        select * from edu_user where username=#{username} and is_delete=1
+    </select>
+    <select id="confirmEmail" parameterType="string"  resultType="com.example.writeagain.javabean.User">
+        select * from edu_user where email=#{email} and is_delete=1
+    </select>
+    <insert id="setCAPTCHA">
+        insert into edu_code (code, email, gmt_created) VALUE
+        (#{CAPTCHA},#{email},#{date})
+    </insert>
+    <update id="updateCAPTCHA">
+        update edu_code set code=#{captcha} , gmt_created=#{date} where email=#{email}
+    </update>
+    <select id="getGmtCreatedByEmail" parameterType="string" resultType="java.util.Date">
+        select gmt_created from edu_code where email=#{email}
+    </select>
+    <select id="getCaptchaByEmail" parameterType="string" resultType="integer">
+        select code from edu_code where email=#{email}
+    </select>
+    <insert id="uploadPassWord" parameterType="com.example.writeagain.javabean.User">
+        UPDATE edu_user set pass_word=#{passWord} where email=#{email}
+    </insert>
+</mapper>

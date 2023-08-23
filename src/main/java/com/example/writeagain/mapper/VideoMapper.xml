@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.writeagain.mapper.VideoMapper">
+    <insert id="addVideo" parameterType="com.example.writeagain.javabean.video">
+        insert into edu_video (course_id, chapter_id, title, video_source_id, video_original_name, play_count, is_free, duration, status, size, gmt_created, gmt_modified) VALUE
+        (#{courseId},#{chapterId},#{title},#{videoSourceId},#{videoOriginalName},#{playCount},#{free},#{duration},#{status},#{size},#{gmtCreated},#{gmtModified})
+    </insert>
+    <select id="findVideoSourceIdsByChapterId" resultType="string">
+        select video_source_id from edu_video where chapter_id =#{chapterId} and course_id =#{courseId}
+    </select>
+    <delete id="deleteVideoByChapterId">
+        delete from edu_video where chapter_id=#{chapterId} and course_id = #{courseId}
+    </delete>
+    <delete id="deleteVideo" parameterType="int">
+        delete from edu_video where id=#{id}
+    </delete>
+    <delete id="deleteVideoByCourseId" parameterType="int">
+        delete from edu_video where course_id=#{id}
+    </delete>
+    <select id="findVideoById" parameterType="int" resultType="com.example.writeagain.javabean.video">
+        select id,title,size, from edu_video where id = #{id}
+    </select>
+    <update id="updateVideo" parameterType="com.example.writeagain.javabean.video">
+        update edu_video set gmt_modified=#{gmtModified}, size=#{size}, duration=#{duration},
+                             is_free=#{free}, video_original_name=#{videoOriginalName},
+                             video_source_id=#{videoSourceId}, title=#{title}
+                        where id = #{id}
+    </update>
+</mapper>

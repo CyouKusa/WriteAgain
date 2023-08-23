@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.writeagain.mapper.SubjectMapper">
+    <select id="getSubjects" resultType="com.example.writeagain.javabean.Subject">
+        select * from edu_subject
+    </select>
+    <select id="getParentSubjects" resultType="com.example.writeagain.javabean.Subject">
+        select * from edu_subject where parent_id=0
+    </select>
+    <select id="getSonSubjects" parameterType="int" resultType="com.example.writeagain.javabean.Subject">
+        select * from edu_subject where parent_id=#{id}
+    </select>
+    <insert id="addSubject" parameterType="com.example.writeagain.javabean.Subject">
+        insert into edu_subject (title, parent_id, gmt_created, gmt_modified) value
+        (#{title},#{parentId},#{gmtCreated},#{gmtModified})
+    </insert>
+    <delete id="deleteSubjects" parameterType="list">
+        delete from edu_subject where id in 
+        <foreach collection="idList" open="(" separator="," close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="getChildID" parameterType="int" resultType="int">
+        select id from edu_subject where parent_id=#{id}
+    </select>
+    <select id="getParentIdById" parameterType="int" resultType="integer">
+        select parent_id FROM edu_subject where id = #{id}
+    </select>
+    <select id="getParentById" parameterType="int" resultType="com.example.writeagain.javabean.Subject">
+        select * from edu_subject where id= #{id}
+    </select>
+</mapper>

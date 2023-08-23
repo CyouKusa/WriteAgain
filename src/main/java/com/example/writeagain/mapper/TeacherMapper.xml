@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.writeagain.mapper.TeacherMapper">
+    <insert id="addTeacher" parameterType="com.example.writeagain.javabean.Teacher">
+        insert into edu_teacher (name, level, career, intro, avatar, is_delete, gmt_created, gmt_modified) VALUE
+        (#{name},#{level},#{career},#{intro},#{avatar},#{isDetele},#{gmtCreated},#{gmtModified})
+    </insert>
+    <select id="showTeacherByPage" resultType="com.example.writeagain.javabean.Teacher">
+    SELECT * FROM edu_teacher
+    <where>
+    is_delete = 1
+        <if test="condition.name!='' and condition.name!=null">
+            AND name LIKE "%${condition.name}%"
+        </if>
+        <if test="condition.level!=0">
+            AND level = #{condition.level}
+        </if>
+        <if test="condition.startTime!=null">
+            AND gmt_created &gt; #{condition.startTime}
+        </if>
+        <if test="condition.endTime!=null">
+            AND gmt_created &lt; #{condition.endTime}
+        </if>
+    </where>
+    LIMIT #{index},#{pagesize}
+    </select>
+    <select id="getTeacherListTotal" parameterType="com.example.writeagain.vo.Condition" resultType="int">
+        SELECT COUNT(*) FROM edu_teacher
+        <where>
+            is_delete = 1
+            <if test="name!='' and name!=null">
+                AND name LIKE "%${name}%"
+            </if>
+            <if test="level!=0">
+                AND level = #{level}
+            </if>
+            <if test="startTime!=null">
+                AND gmt_created &gt; #{startTime}
+            </if>
+            <if test="endTime!=null">
+                AND gmt_created &lt; #{endTime}
+            </if>
+        </where>
+    </select>
+    <update id="deleteTeacher" parameterType="int">
+        update edu_teacher set is_delete = 0 where id = #{id} and is_delete = 1
+    </update>
+    <select id="findTeacherById" parameterType="int" resultType="com.example.writeagain.javabean.Teacher">
+        select * from edu_teacher where id=#{id} and is_delete = 1
+    </select>
+    <update id="updateTeacher" parameterType="com.example.writeagain.javabean.Teacher">
+        update edu_teacher set name=#{name} , intro=#{intro} , avatar=#{avatar} , career=#{career} , level=#{level}
+                              ,  gmt_modified = #{gmtModified} where id=#{id} and is_delete = 1
+    </update>
+    <update id="deleteSelected" parameterType="integer">
+        update edu_teacher set is_delete=0
+    <where>
+        <foreach collection="ids" item="id" open="id in(" separator="," close=")" >
+        #{id}
+        </foreach>
+        and is_delete = 1;
+    </where>
+    </update>
+    <select id="selectTeacherAll" resultType="com.example.writeagain.javabean.Teacher">
+        select id,name from edu_teacher where is_delete=1;
+    </select>
+</mapper>
